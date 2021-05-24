@@ -24,11 +24,12 @@ Route::get('login', 'UsersController@loginPage')->name('login');
 Route::get('register/{username?}', 'UsersController@register')->name('register');
 Route::get('password-reset', 'UsersController@resetPass')->name('password-reset');
 Route::post('sendPass', 'UsersController@sendPass')->name('sendPass');
+Route::get('/', 'UsersController@homePage')->name('/');
 
 
 Route::group(['middleware' => ['auth']], function () {
 
-Route::get('/', 'UsersController@index')->name('/');
+Route::get('dashboard', 'UsersController@index')->name('dashboard');
 Route::get('add-package', 'UsersController@packages')->name('add-package');
 Route::get('packages', 'UsersController@userPackages')->name('packages');
 Route::get('referrals', 'UsersController@referrals')->name('referrals');
@@ -40,6 +41,8 @@ Route::post('mpesaDeposit', 'UsersController@mpesaDeposit')->name('mpesaDeposit'
 Route::post('packageSub', 'UsersController@packageSub')->name('packageSub');
 Route::post('transferFunds', 'UsersController@transferFunds')->name('transferFunds');
 Route::post('withdrawFunds', 'UsersController@withdrawFunds')->name('withdrawFunds');
+Route::get('profile', 'UsersController@profile')->name('profile');
+Route::get('referral', 'UsersController@referral')->name('referral');
 
 
 

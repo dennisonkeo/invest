@@ -49,12 +49,12 @@ class AdminUserController extends Controller
     		$multiplier = 1;
     	}
 
-    	$referralEarning = Referral::where('referrer', Auth::user()->id)->sum('amount');
-    	$withdrawn = Withdrawal::where('user_id', Auth::user()->id)->sum('amount');
-    	$referrals = Referral::where('referrer', Auth::user()->id)->where('level', 1)->count();
+    	$users = User::all()->count();
+    	$todayUsers = User::where('date', date('Y-m-d'))->count();
+    	$activeUsers = User::where('active', 1)->count();
 
        
-       return view('admin.index', compact('multiplier','referralEarning', 'withdrawn', 'referrals'));
+       return view('admin.index', compact('users','activeUsers', 'todayUsers'));
     }
 
     public function withdrawals()

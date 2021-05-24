@@ -78,7 +78,7 @@
 							<div class="card-body">
 								<div class="media align-items-center">
 									<div class="media-body mr-3">
-										<h2 class="num-text text-white font-w700">{{ number_format(Auth::user()->wallet * $multiplier) }}</h2>
+										<h2 class="num-text text-white font-w700">{{ number_format($users) }}</h2>
 										<span class="fs-14">Total Users</span>
 									</div>
 
@@ -94,7 +94,7 @@
 							<div class="card-body">
 								<div class="media align-items-center">
 									<div class="media-body mr-3">
-										<h2 class="num-text text-white font-w700">{{ number_format(Auth::user()->deposit * $multiplier) }}</h2>
+										<h2 class="num-text text-white font-w700">{{ number_format($todayUsers) }}</h2>
 										<span class="fs-14">Today's Users</span>
 									</div>
 
@@ -109,7 +109,7 @@
 							<div class="card-body">
 								<div class="media align-items-center">
 									<div class="media-body mr-3">
-										<h2 class="num-text text-white font-w700">{{ number_format(Auth::user()->interest * $multiplier) }}</h2>
+										<h2 class="num-text text-white font-w700">{{ number_format($activeUsers) }}</h2>
 										<span class="fs-14">Active Users</span>
 									</div>
 									<i style="font-size: 36px; coor: #864AD1;" class="fa fa-users"></i>

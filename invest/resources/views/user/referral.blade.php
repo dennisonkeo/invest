@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>Invest - Withdrawal History </title>
+    <title>Invest - Refarral Link </title>
     <!-- Favicon icon -->
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon.png">
     <!-- Datatable -->
@@ -100,39 +100,31 @@
 
                     <div class="col-12">
                         <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Wallet Balance: <span class="badge light badge-primary">{{ number_format(Auth::user()->wallet,2 )}}</span> </h4>
-                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addProjectSidebar">Withdraw <i class="fa fa-money"></i></button>
-                            </div>
+
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table id="example" class="display" style="min-width: 845px">
-                                        <thead>
-                                            <tr>
-                                                <th>Amount</th>
-                                                <th>Phone</th>
-                                                <th>Status</th>
-                                                <th>Transaction Time</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($withdrawals as $withdrawal)
-                                            <tr>
-                                                <td>{{ $withdrawal->amount }}</td>
-                                                <td>{{ $withdrawal->user->phone }}</td>
-                                                @if($withdrawal->status == 0)
-                                                    <td><span class="badge light badge-danger">Pending</span></td>
-                                                @else
-                                                    <td><span class="badge light badge-primary">Completed</span></td>
-                                                @endif
-                                                <td>{{ $withdrawal->date }}</td>
 
-                                            </tr>
-                                            @endforeach
+              <div class="col-md-12">
+                <div class="profile-right">
 
-                                        </tfoot>
-                                    </table>
-                                </div>
+                  <div class="form-group row">
+                        <span for="signup-firstname" class="col-sm-3 col-form-label badge-success"><i class="fa fa-link"></i> Referral Link </span>
+                        
+                        <div class="col-sm-9">
+                            <br><br> <br><br>
+                          <input type="text" class="form-control" id="myInput" value="{{ asset('/register') }}/{{ Auth::user()->username }}">
+                        </div>
+                        
+                      </div>
+                    <br><br> <br><br>
+                  <center>
+                      <button onclick="myFunction()" class="btn" style="background-color: #3b5998;color:white;">Click here to copy your referral Link</button></a>
+                        </center>
+                  
+           
+              <!-- end right column -->
+            </div>
+          </div>
+
                             </div>
                         </div>
                     </div>
@@ -147,7 +139,7 @@
 					<div class="modal-dialog" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title">Withdraw Funds (Minimum withdrawal Ksh 500)</h5>
+								<h5 class="modal-title">Deposit Funds</h5>
 								<button type="button" class="close" data-dismiss="modal"><span>&times;</span>
 								</button>
 							</div>
@@ -159,15 +151,48 @@
 										<label class="text-black font-w500">Amount</label>
 										<input type="number" class="form-control" name="amount" id="amount" required="">
 									</div>
+                                    <div class="form-group">
+                                        <label class="text-black font-w500">Phone</label>
+                                        <input type="text" class="form-control" name="phone" id="phone" value="{{ Auth::user()->phone }}" required="">
+                                    </div>
 
 									<div class="form-group">
-										<button type="button" onclick="withdraw()" class="btn btn-primary">WITHDRAW</button>
+										<button type="button" onclick="pay()" class="btn btn-primary">DEPOSIT</button>
 									</div>
 								</form>
 							</div>
 						</div>
 					</div>
 				</div>
+
+
+                <!-- Transfer funds -->
+                <div class="modal fade" id="addProjectSidebar2">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Transfer Funds (From Grand Wallet) <span class="badge light badge-primary">Wallet:{{ number_format(Auth::user()->wallet )}}</span></h5>
+                                
+                                <button type="button" class="close" data-dismiss="modal"><span>&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="POST" action="#">
+                                    {{ csrf_field() }}
+
+                                    <div class="form-group">
+                                        <label class="text-black font-w500">Amount</label>
+                                        <input type="number" class="form-control" name="amount" id="amount2" required="">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <button type="button" onclick="transfer()" class="btn btn-primary">TRANSFER</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
 
         <!--**********************************
@@ -214,7 +239,7 @@
 
   <script type="text/javascript">
     
-function withdraw()
+    function pay()
     {
 
       Swal.fire({
@@ -229,10 +254,60 @@ function withdraw()
                   }).then((result) => {
                     if (result.value) {
                          $.ajax({
-                          url : "{{ route('withdrawFunds') }}",
+                          url : "{{ route('mpesaDeposit') }}",
                           type: "POST",
                           data:{'_token':'{{ csrf_token() }}',
-                                'amount': $("#amount").val()
+                                'amount': $('#amount').val(),
+                                'phone': $('#phone').val()
+                      },
+                          dataType: "JSON",
+                          success: function(data)
+                          {                 
+                                Swal.fire({
+                                  title: 'Sent!',
+                                  text: "Payment request has been sent to your phone, click OK when done!",
+                                  type: 'success',
+                                  closeButtonText: 'No, cancel!',
+                                }
+                                ).then((result)=>{
+
+                                  location.reload();
+                                }
+                                );
+                            },
+                            error: function (jqXHR, textStatus, errorThrown)
+                            {
+                                // alert('Error deleting data');
+                                Swal.fire({
+                                           title: 'Oops...',
+                                            text: 'Error sending request!',
+                                            type: 'error',
+                                          })
+                            }
+                        });                     
+                    }
+                  });
+    }
+
+    function transfer()
+    {
+
+      Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes!',
+                    showLoaderOnConfirm: true,
+                  }).then((result) => {
+                    if (result.value) {
+                         $.ajax({
+                          url : "{{ route('transferFunds') }}",
+                          type: "POST",
+                          data:{'_token':'{{ csrf_token() }}',
+                                'amount': $("#amount2").val()
                       },
                           dataType: "JSON",
                           success: function(data)
@@ -241,7 +316,7 @@ function withdraw()
                            {
                                 Swal.fire({
                                   title: 'Success!',
-                                  text: "Request sent successfully!",
+                                  text: "Funds transferred successfully!",
                                   type: 'success',
                                   closeButtonText: 'No, cancel!',
                                 }
@@ -256,15 +331,6 @@ function withdraw()
                                 Swal.fire({
                                            title: 'Oops...',
                                             text: 'Sorry, you do not have sufficient balance in your Wallet!',
-                                            type: 'error',
-                                          })
-
-                            }
-                            else if(data.msg == 2)
-                            {
-                                Swal.fire({
-                                           title: 'Oops...',
-                                            text: 'Sorry, the amount should not be less than Ksh 500!',
                                             type: 'error',
                                           })
 
@@ -284,6 +350,7 @@ function withdraw()
                     }
                   });
     }
+
   </script>
 
 

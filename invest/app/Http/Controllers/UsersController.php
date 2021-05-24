@@ -56,6 +56,27 @@ class UsersController extends Controller
        return view('user.index', compact('multiplier','referralEarning', 'withdrawn', 'referrals'));
     }
 
+    public function homePage()
+    {
+      return view('home.index');
+    }
+
+    public function profile()
+    {
+
+      $user = Auth::user();
+
+      return view('user.profile', compact('user'));
+    }
+
+    public function referral()
+    {
+
+      $user = Auth::user();
+
+      return view('user.referral', compact('user'));
+    }
+
     public function updateInterest()
     {
     	$userPackages = PackageUser::where('user_id', Auth::user()->id)->where('status', 1)->get();
@@ -114,10 +135,10 @@ class UsersController extends Controller
     {
        $phone="";
 	    $this->validate($request, [
-	        'email' => 'required|email',
+	        'username' => 'required',
 	        'password' => 'required',
 	        ]);
-	    if (Auth::attempt(['email' => $request->email,'password' => $request->password]) )
+	    if (Auth::attempt(['username' => $request->username,'password' => $request->password]) )
 	    {
 	    	if(Auth::user()->role == "user")
 	    	{
@@ -125,7 +146,7 @@ class UsersController extends Controller
 
 	    		$this->updateInterest();
 
-	    		return redirect('/');
+	    		return redirect('dashboard');
 	    	}
 	    	elseif(Auth::user()->role == "admin")
 	    	{
@@ -552,7 +573,7 @@ $curl_post_data = array(
   'PartyA' => $phone,
   'PartyB' => '5483281',
   'PhoneNumber' =>$phone,
-  'CallBackURL' => 'https://lazy-dodo-49.loca.lt/api/mpesa-response',
+  'CallBackURL' => 'https://heavy-penguin-66.loca.lt/api/mpesa-response',
   'AccountReference' => $AccountReference,
   'TransactionDesc' => $TransactionDesc
 );
