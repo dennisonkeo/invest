@@ -9,6 +9,7 @@ use App\Package;
 use App\PackageUser;
 use App\Deposit;
 use App\Withdrawal;
+use App\Message;
 use Illuminate\Support\Facades\Hash;
 use App\Notifications\HelloUser;
 use App\Notifications\ResetPass;
@@ -738,5 +739,167 @@ public function mpesa_response(Request $request)
             $user->notify(new ResetPass($pass));
 
          return back()->with('success', 'Password has been sent to your email address!');
+  }
+
+  public function inbox()
+  {
+    $role = Auth::user()->role;
+
+    if($role == "admin")
+    {
+      $messages = Message::where('receiver', 'admin')->orderBy('id', 'desc')->get();
+
+      $unread = Message::where('receiver', 'admin')->where('msg_read', 0)->count();
+
+      return view('user.inbox', compact('messages', 'role', 'unread'));
+    }
+    else
+    {
+        $msgs = Message::where('receiver_id', Auth::user()->id)->get();
+
+        $unread = Message::where('receiver_id', Auth::user()->id)->where('msg_read', 0)->count();
+
+        return view('user.inbox', compact('msgs', 'role', 'unread'));
+    }
+
+    
+  }
+
+
+  public function outBox()
+  {
+    $role = Auth::user()->role;
+
+    if($role == "admin")
+    {
+      $messages = Message::where('receiver', 'user')->orderBy('id', 'desc')->get();
+
+      $unread = Message::where('receiver', 'admin')->where('msg_read', 0)->count();
+
+      return view('user.outbox', compact('messages', 'role', 'unread'));
+    }
+    else
+    {
+        $msgs = Message::where('user_id', Auth::user()->id)->where('receiver', 'admin')->get();
+
+        $unread = Message::where('receiver_id', Auth::user()->id)->where('msg_read', 0)->count();
+
+        return view('user.outbox', compact('msgs', 'role', 'unread'));
+    }
+
+    
+  }
+
+  public function sendMsg(Request $request)
+  {
+     $receiver = User::where('username', $request->username)->first();
+
+     if(!$receiver && Auth::user()->role == "admin")
+     {
+        return back()->with('warning', 'The user does not exist!');
+     }
+     elseif(Auth::user()->role == "admin")
+     {
+        $msg = new Message;
+        $msg->user_id = Auth::user()->id;
+        $msg->receiver_id = $receiver->id;
+        $msg->subject = $request->subject;
+        $msg->date = date('Y-m-d');
+        $msg->time = date('H:i:s');
+        $msg->msg = $request->msg;
+
+        $msg->save();
+     }
+     else
+     {
+        $msg = new Message;
+        $msg->user_id = Auth::user()->id;
+        $msg->subject = $request->subject;
+        $msg->date = date('Y-m-d');
+        $msg->time = date('H:i:s');
+        $msg->msg = $request->msg;
+        $msg->receiver = "admin";
+
+        $msg->save();
+     }
+        
+
+      return back()->with('success', 'Message sent!');
+  }
+
+  public function readMsg($id)
+  {
+    $role = Auth::user()->role;
+
+    if(Auth::user()->role == "admin")
+    {
+
+       Message::where('id', $id)
+            ->update(array(
+                'msg_read' => 1
+            ));
+
+
+      $unread = Message::where('receiver', 'admin')->where('msg_read', 0)->count();
+
+      $msg = Message::where('id', $id)->first();
+
+   
+    return view('user.readMsg', compact('msg', 'unread', 'role'));
+    }
+    else
+    {
+
+      Message::where('id', $id)
+            ->update(array(
+                'msg_read' => 1
+            ));
+
+      $unread = Message::where('receiver_id', Auth::user()->id)->where('msg_read', 0)->count();
+
+      $msg = Message::where('id', $id)->where('receiver_id', Auth::user()->id)->firstOrFail();
+   
+
+    return view('user.readMsg', compact('msg', 'unread', 'role'));
+    }
+    
+  }
+
+  public function readSentMsg($id)
+  {
+    $role = Auth::user()->role;
+
+    if(Auth::user()->role == "admin")
+    {
+
+       Message::where('id', $id)
+            ->update(array(
+                'msg_read' => 1
+            ));
+
+
+      $unread = Message::where('receiver', 'admin')->where('msg_read', 0)->count();
+
+      $msg = Message::where('id', $id)->first();
+
+   
+    return view('user.readMsg', compact('msg', 'unread', 'role'));
+    }
+    else
+    {
+
+      Message::where('id', $id)
+            ->update(array(
+                'msg_read' => 1
+            ));
+
+      $unread = Message::where('receiver_id', Auth::user()->id)->where('msg_read', 0)->count();
+
+      $msg = Message::where('id', $id)->where('user_id', Auth::user()->id)->firstOrFail();
+   
+
+    return view('user.readMsg', compact('msg', 'unread', 'role'));
+    }
+    
   }
 }

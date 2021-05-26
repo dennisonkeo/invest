@@ -43,6 +43,11 @@ Route::post('transferFunds', 'UsersController@transferFunds')->name('transferFun
 Route::post('withdrawFunds', 'UsersController@withdrawFunds')->name('withdrawFunds');
 Route::get('profile', 'UsersController@profile')->name('profile');
 Route::get('referral', 'UsersController@referral')->name('referral');
+Route::get('messages', 'UsersController@inbox')->name('messages');
+Route::get('sent-messages', 'UsersController@outBox')->name('sent-messages');
+Route::get('read-message/{id}', 'UsersController@readMsg')->name('read-message');
+Route::get('sent-message/{id}', 'UsersController@readSentMsg')->name('sent-message');
+Route::post('sendMsg', 'UsersController@sendMsg')->name('sendMsg');
 
 
 

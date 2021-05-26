@@ -48,7 +48,7 @@
                     </li>
 
                     <li>
-                        <a href="#" class="ai-icon" aria-expanded="false">
+                        <a href="{{ route('messages') }}" class="ai-icon" aria-expanded="false">
                             <i class="fa fa-envelope"></i>
                             <span class="nav-text">LiveChat</span>
                         </a>
